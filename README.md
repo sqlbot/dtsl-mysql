@@ -59,7 +59,7 @@ Sorry, no capturing groups (e.g. `\1` or `$1`) support.  If you really need rege
 
 Maybe it's old static content, who knows how it got that way -- I'm not judging -- but the data, for whatever reason, is now in your database and it's making you crazy.  When you send it straight to a web page, sure, it's fine, but when you put it in a report or something -- yuck.  You can clean these up, either on demand or en masse, with `decode_entities(longtext)`.
 
-`LONGTEXT` in, `LONGTEXT` out, if there are any HTML entities -- either named or numeric, in decimal or hex -- they will be converted to their utf-8 equivalents in the output.  As many matching entitie as we can find in the input will be replaced in the output; things that look like they might have been entities, but we didn't recognize them (let's say, `&foo100;`) are passed through unaltered.  Strings with no matching entities are returned unchanged as soon as we realize there's nothing to do.
+`LONGTEXT` in, `LONGTEXT` out, if there are any HTML entities -- either named or numeric, in decimal or hex -- they will be converted to their utf-8 equivalents in the output.  As many matching entities as we can find in the input will be replaced in the output; things that look like they might have been entities, but we didn't recognize them (let's say, `&foo100;`) are passed through unaltered.  Strings with no matching entities are returned unchanged as soon as we realize there's nothing to do.
 
     mysql> SELECT dtsl.decode_entities('I &hearts; HTML&trade; &Eacute;&ntilde;t&igrave;ties &#10004; &amp; &#x2714;');
     +------------------------------------------------------------------------------------------------------+
