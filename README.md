@@ -13,7 +13,7 @@ This project and its actual code will be published soon.
 
 ----
 
-The rest of this is a draft.  Still deciding on how to organize the documentation,
+The rest of this is a draft.  Still deciding on how to organize the documentation.
 
 #### Read this, first.
 
@@ -31,9 +31,9 @@ Sometimes, it's nice to let the database take care of something, even when the d
 
 I solved this one during a boring meeting.
 
-MySQL, natively, can only *match* on regexes, it can't *replace* the pattern with something else.  But it can replace a chunk of a string with something else, given a character position and lenght.  Can we combine those into something useful?  We can.
+MySQL, natively, can only *match* on regexes, it can't *replace* the pattern with something else.  But it can replace a chunk of a string with something else, given a character position and length.  Can we combine those into something useful?  We can.
 
-This is not a perfect solution to all your regexing needs; its performance is limited by the capabilitis exposed by MySQL (and probably by some optimization paths I overlooked), but if you need some simple regular expression-based replacing, watch this:
+This is not a perfect solution to all your regexing needs; its performance is limited by the capabilities exposed by MySQL (and probably by some optimization paths I overlooked), but if you need some simple regular expression-based replacing, watch this:
 
     mysql> SELECT dtsl.regex_replace('The quick brown fox','[aeiou]+','x');
     +----------------------------------------------------------+
@@ -59,7 +59,7 @@ Sorry, no capturing groups (e.g. `\1` or `$1`) support.  If you really need rege
 
 Maybe it's old static content, who knows how it got that way -- I'm not judging -- but the data, for whatever reason, is now in your database and it's making you crazy.  When you send it straight to a web page, sure, it's fine, but when you put it in a report or something -- yuck.  You can clean these up, either on demand or en masse, with `decode_entities(longtext)`.
 
-`LONGTEXT` in, `LONGTEXT` out, if there are any HTML entite -- either named or numeric, in decimal or hex -- they will be converted to their utf-8 equivalents in the output.  As many matching entitis as we can find in the input will be replaced in the output; things that look like they might have been entities, but we didn't recognize them (let's say, `&foo100;`) are passed through unaltered.  Strings with no matching entites are returned unchanged as soon as we realize there's nothing to do.
+`LONGTEXT` in, `LONGTEXT` out, if there are any HTML entities -- either named or numeric, in decimal or hex -- they will be converted to their utf-8 equivalents in the output.  As many matching entitie as we can find in the input will be replaced in the output; things that look like they might have been entities, but we didn't recognize them (let's say, `&foo100;`) are passed through unaltered.  Strings with no matching entities are returned unchanged as soon as we realize there's nothing to do.
 
     mysql> SELECT dtsl.decode_entities('I &hearts; HTML&trade; &Eacute;&ntilde;t&igrave;ties &#10004; &amp; &#x2714;');
     +------------------------------------------------------------------------------------------------------+
@@ -75,7 +75,7 @@ Tell me that isn't beautiful to behold.
 
 ##### Support for particularly useful subsets of iso8601 formatting of datetimes
 
-MySQL has some excellend built-in date/time maniupulation functions and a useful implemetation of time zones, including the magic handling of `TIMESTAMP` columns in the current session `@@time_zone` but lacks the ability to accept timestamps you may receive from external APIs and other places.
+MySQL has some excellent built-in date/time manipulation functions and a useful implementation of time zones, including the magic handling of `TIMESTAMP` columns in the current session `@@time_zone` but lacks the ability to accept timestamps you may receive from external APIs and other places.
 
 We have that one covered:
 
@@ -112,11 +112,11 @@ The current implementation works with the following formats, because these are t
 
 Additional formats should be fairly straightforward to implement if needed.
 
-MySQL Server 5.6 introduced millisecond and microsecond datetimes and timestamps, but stored functions don't support dynamic typing, so it's impossible to selectively return a `DATETIME` or a `DATETIME(3)` or a `DATETIME(6)` depending on the particular input parameters.  And yet, it's very arguably wrong to implicitly convert '2015-03-23T12:00:00Z' into '2015-03-23 12:00:00.000000' because of the false sense of precision this provides.  Future iterations of this function may actually resort to returning a `TINYTEXT` and letting MySQL implicitly cast it it to the approprate type for your use -- so, for example, if you provide a timestamp with precision to the millisecond, we'll provide a return value with the same three decimals populated.
+MySQL Server 5.6 introduced millisecond and microsecond datetimes and timestamps, but stored functions don't support dynamic typing, so it's impossible to selectively return a `DATETIME` or a `DATETIME(3)` or a `DATETIME(6)` depending on the particular input parameters.  And yet, it's very arguably wrong to implicitly convert '2015-03-23T12:00:00Z' into '2015-03-23 12:00:00.000000' because of the false sense of precision this provides.  Future iterations of this function may actually resort to returning a `TINYTEXT` and letting MySQL implicitly cast it it to the appropriate type for your use -- so, for example, if you provide a timestamp with precision to the millisecond, we'll provide a return value with the same three decimals populated.
 
 ##### Find the short, common, human-friendly abbreviation of a particular time zone at a particular point in time.
 
-This is useful for showing timestamps to humans who are unfamiliary with time zone names like "America/Chicago."  Of course, these are the same people who will use the phrase "Eastern Standard Time" in the summer, when it is in fact "Eastern Daylight Time," but we can only solve so many problems at the database level.
+This is useful for showing timestamps to humans who are unfamiliar with time zone names like "America/Chicago."  Of course, these are the same people who will use the phrase "Eastern Standard Time" in the summer, when it is in fact "Eastern Daylight Time," but we can only solve so many problems at the database level.
 
     mysql> SELECT dtsl.time_zone_abbrev_at_ref('America/Chicago','2015-01-01 00:00:00');
     +-----------------------------------------------------------------------+
@@ -153,7 +153,7 @@ Seems legit.
 
 Not surprisingly, these functions were actually the original inspiration for collecting similar functions into "dt," which originally stood for "date/time" and later became an internal backronym for "data tools" and finally evolved into "dtsl."  Tragically, they are perhaps the least exciting in appearance, despite the fact that they are tremendously useful for creating easy to write, easy to understand, easy to debug, and easy to optimize queries.
 
-Queries for dates matchin "this week" or "last month" are best handled by providing the query optimizer with something it can reduce to a constant expression, in the interest of sargability -- which is a huge thing, and if you don't know about it already, you'll be embarrassed when you discover it.
+Queries for dates matching "this week" or "last month" are best handled by providing the query optimizer with something it can reduce to a constant expression, in the interest of sargability -- which is a huge thing, and if you don't know about it already, you'll be embarrassed when you discover it.
 
 While logically correct, queries in the following form will force a full table scan, since functions in the `WHERE` clause with columns as arguments give the query optimizer no alternative.  Never, ever do this, and be sure to scoff at anyone who does.
 
@@ -169,7 +169,7 @@ The correct way to write this query is more along these lines:
      WHERE took_place_at >= '2016-02-01 00:00:00' 
        AND took_place_at < '2016-03-01 00:00:00';
   
-This form presents the optimzer with constant values, which it readily uses to select rows from the index on `took_place_at`.  
+This form presents the optimizer with constant values, which it readily uses to select rows from the index on `took_place_at`.  
   
 DTSL allows you to write this query without having to do the date math separately.
 
@@ -178,7 +178,7 @@ DTSL allows you to write this query without having to do the date math separatel
      WHERE took_place_at >= dtsl.prev_month_start(NOW()) 
        AND took_place_at < dtsl.curr_month_start(NOW());
 
-The optimizer realizes that over the course of the query, `NOW()` cannot change, and therefor the results of the deterministic functions cannot change, and therefor the functions can be evaluated into constants only once, and used with the index on the column `took_place_at`.  
+The optimizer realizes that over the course of the query, `NOW()` cannot change, and therefore the results of the deterministic functions cannot change, and therefore the functions can be evaluated into constants only once, and used with the index on the column `took_place_at`.  
 
 See these functions:
 
@@ -224,7 +224,7 @@ So, here's the fix: assume MM/DD/YY dates always refer to something prior to `NO
     +-------------------------------------------+
     1 row in set (0.00 sec)
 
-Sigh.  And, of course, I have to include this here in the canonical distribution, becaue I need it on my servers, and I intend to deploy dtsl onto them from this distribution.
+Sigh.  And, of course, I have to include this here in the canonical distribution, because I need it on my servers, and I intend to deploy dtsl onto them from this distribution.
 
 ----
 
