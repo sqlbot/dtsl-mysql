@@ -1,5 +1,5 @@
 # dtsl-mysql
-Date/Time/Strings Libraries (DTSL) for MySQL
+### Date/Time/Strings Library (DTSL) for MySQL
 
 DTSL is collection of stored functions and procedures for manipulating date, time, and string values, for MySQL, MariaDB, and Percona Server.
 
@@ -15,7 +15,7 @@ This project and its actual code will be published soon.
 
 The rest of this is a draft.  Still deciding on how to organize the documentation.
 
-#### Read this, first.
+### Read this, first.
 
 I have a deep and abiding sense of irritation reserved for people who are nice enough to share their code but apparently not nice enough to explain how it works and how to use it... so I am determined not to be one of those people.
 
@@ -23,11 +23,11 @@ I will be writing a comprehensive guide to all of the features and capabilities 
 
 If you "do not have time" to read this entire document carefully, please note that I will also not have time to re-answer any questions already covered, here. 
 
-#### Text/String Functions
+### Text/String Functions
 
 Sometimes, it's nice to let the database take care of something, even when the database is arguably the "wrong" place to do it.
 
-##### RLIKE is all there is?  What about regex_replace?
+#### RLIKE is all there is?  What about regex_replace?
 
 I solved this one during a boring meeting.
 
@@ -55,7 +55,7 @@ How about that? For each occurrence of 1 or more characters in [aeiou], we repla
 
 Sorry, no capturing groups (e.g. `\1` or `$1`) support.  If you really need regexes that badly, you need to be using something more efficient... but this is a sweet little coup that allow some easy matching and cleanup with replacements.
 
-###### HTML entities in strings in your database?
+#### HTML entities in strings in your database?
 
 Maybe it's old static content, who knows how it got that way -- I'm not judging -- but the data, for whatever reason, is now in your database and it's making you crazy.  When you send it straight to a web page, sure, it's fine, but when you put it in a report or something -- yuck.  You can clean these up, either on demand or en masse, with `decode_entities(longtext)`.
 
@@ -71,9 +71,9 @@ Maybe it's old static content, who knows how it got that way -- I'm not judging 
 
 Tell me that isn't beautiful to behold.
 
-#### Date/Time Handling
+### Date/Time Handling
 
-##### Support for particularly useful subsets of iso8601 formatting of datetimes
+#### Support for particularly useful subsets of iso8601 formatting of datetimes
 
 MySQL has some excellent built-in date/time manipulation functions and a useful implementation of time zones, including the magic handling of `TIMESTAMP` columns in the current session `@@time_zone` but lacks the ability to accept timestamps you may receive from external APIs and other places.
 
@@ -114,7 +114,7 @@ Additional formats should be fairly straightforward to implement if needed.
 
 MySQL Server 5.6 introduced millisecond and microsecond datetimes and timestamps, but stored functions don't support dynamic typing, so it's impossible to selectively return a `DATETIME` or a `DATETIME(3)` or a `DATETIME(6)` depending on the particular input parameters.  And yet, it's very arguably wrong to implicitly convert '2015-03-23T12:00:00Z' into '2015-03-23 12:00:00.000000' because of the false sense of precision this provides.  Future iterations of this function may actually resort to returning a `TINYTEXT` and letting MySQL implicitly cast it it to the appropriate type for your use -- so, for example, if you provide a timestamp with precision to the millisecond, we'll provide a return value with the same three decimals populated.
 
-##### Find the short, common, human-friendly abbreviation of a particular time zone at a particular point in time.
+#### Find the short, common, human-friendly abbreviation of a particular time zone at a particular point in time.
 
 This is useful for showing timestamps to humans who are unfamiliar with time zone names like "America/Chicago."  Of course, these are the same people who will use the phrase "Eastern Standard Time" in the summer, when it is in fact "Eastern Daylight Time," but we can only solve so many problems at the database level.
 
@@ -149,7 +149,7 @@ Now, let's see if we can make this do something useful.
 
 Seems legit.
  
-##### Given a date or datetime, find the first day of the [ previous | current | next ] [ week | month | quarter | year ] based on that date.
+#### Given a date or datetime, find the first day of the [ previous | current | next ] [ week | month | quarter | year ] based on that date.
 
 Not surprisingly, these functions were actually the original inspiration for collecting similar functions into "dt," which originally stood for "date/time" and later became an internal backronym for "data tools" and finally evolved into "dtsl."  Tragically, they are perhaps the least exciting in appearance, despite the fact that they are tremendously useful for creating easy to write, easy to understand, easy to debug, and easy to optimize queries.
 
@@ -194,7 +194,7 @@ TODO: we have these for year and quarter also.
 
 ----
 
-Fix the Y2K bug in the other direction. 
+#### Fix the Y2K bug in the other direction. 
 
 This function is embarrassing.  It should be particularly embarrassing to the client that sends me this data -- sometimes it's in mm/dd/yyyy format, and other times it's in mm/dd/yy format -- in the same table, of course -- where it's populated into a column that was explicitly defined by the client as a *text* field.  I have to keep it in this hideous form because the client refreshes the data via an API call every time the site visitor logs in... but they expect me to interpret it for reporting.
 
